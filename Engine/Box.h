@@ -24,6 +24,10 @@ public:
 	};
 public:
 	static std::unique_ptr<Box> Box::Spawn( float size,const Boundaries& bounds,b2World& world,std::mt19937& rng );
+	static std::unique_ptr<Box> Box::Spawn(
+		const Vec2& pos, const Color color, float size, float angle, Vec2 linVel, float angVel,
+		const Boundaries & bounds, b2World& world, std::mt19937& rng
+	);
 	Box( std::unique_ptr<ColorTrait> pColorTrait, b2World& world,const Vec2& pos,
 		float size = 1.0f,float angle = 0.0f,Vec2 linVel = {0.0f,0.0f},float angVel = 0.0f )
 		:

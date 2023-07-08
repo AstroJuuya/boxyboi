@@ -104,3 +104,54 @@ std::unique_ptr<Box> Box::Spawn( float size,const Boundaries& bounds,b2World& wo
 	
 	return std::make_unique<Box>( std::move( pColorTrait ),world,pos,size,ang,linVel,angVel );
 }
+
+std::unique_ptr<Box> Box::Spawn(
+	const Vec2& pos, const Color color, float size, float angle, Vec2 linVel, float angVel,
+	const Boundaries& bounds, b2World& world, std::mt19937& rng
+)
+{
+	std::unique_ptr<Box::ColorTrait> pColorTrait;
+	switch (color.dword)
+	{
+	case 0xFF0000:
+		pColorTrait = std::make_unique<RedTrait>();
+		break;
+	case 0x00FF00:
+		pColorTrait = std::make_unique<GreenTrait>();
+		break;
+	case 0x0000FF:
+		pColorTrait = std::make_unique<BlueTrait>();
+		break;
+	case 0xFFFFFF:
+		pColorTrait = std::make_unique<WhiteTrait>();
+		break;
+	case 0xFFFF00:
+		pColorTrait = std::make_unique<YellowTrait>();
+		break;
+	}
+
+	if (pColorTrait == nullptr)
+	{
+		std::uniform_int_distribution<int> type_dist(0, 4);
+		switch (type_dist(rng))
+		{
+		case 0:
+			pColorTrait = std::make_unique<RedTrait>();
+			break;
+		case 1:
+			pColorTrait = std::make_unique<GreenTrait>();
+			break;
+		case 2:
+			pColorTrait = std::make_unique<BlueTrait>();
+			break;
+		case 3:
+			pColorTrait = std::make_unique<WhiteTrait>();
+			break;
+		case 4:
+			pColorTrait = std::make_unique<YellowTrait>();
+			break;
+		}
+	}
+
+	return std::make_unique<Box>(std::move(pColorTrait), world, pos, size, angle, linVel, angVel);
+}

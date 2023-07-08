@@ -13,9 +13,13 @@ void ContactListener::BeginContact(b2Contact* contact)
 		auto& tid0 = typeid(boxPtrs[0]->GetColorTrait());
 		auto& tid1 = typeid(boxPtrs[1]->GetColorTrait());
 
-		if (tid0 == tid1)
+		if (boxPtrs[0]->GetColorTrait().GetColor() == Colors::White && tid0 == tid1)
 		{
-			contactPatternMap.emplace(contact, Pattern::SameColor);
+			contactPatternMap.emplace(contact, Pattern::Split);
+		}
+		else if (boxPtrs[0]->GetColorTrait().GetColor() == Colors::Red && tid0 == tid1)
+		{
+			contactPatternMap.emplace(contact, Pattern::Remove);
 		}
 
 		std::stringstream msg;

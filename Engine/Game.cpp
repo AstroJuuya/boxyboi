@@ -62,7 +62,60 @@ void Game::UpdateModel()
 		auto deleteA = contact->GetFixtureA()->GetBody();
 		auto deleteB = contact->GetFixtureB()->GetBody();
 
-		if (it_map->second == ContactListener::SameColor)
+		if (it_map->second == ContactListener::Split)
+		{
+			enum Tiles
+			{
+				TopLeft,
+				TopRight,
+				BottomLeft,
+				BottomRight
+			};
+			std::vector<std::pair<Tiles, Vec2>> tiles =
+			{
+				{ TopLeft,		{ -0.5f,	-0.5f } },
+				{ TopRight,		{  0.5f,	-0.5f } },
+				{ BottomLeft,	{ -0.5f,	 0.5f } },
+				{ BottomRight,	{  0.5f,	 0.5f } }
+			};
+
+			for (int i = 0; i < 4; ++i)
+			{
+				if (reinterpret_cast<Box*>(deleteA->GetUserData())->GetSize() > boxSize / 2)
+				{
+					Vec2 posA = Vec2(deleteA->GetPosition()) + tiles[i].second;
+
+					// Color colorA = reinterpret_cast<Box*>(deleteA->GetUserData())->GetColorTrait().GetColor();
+					Color colorA = Colors::Blue;
+					boxPtrs.emplace_back(
+						Box::Spawn(
+							posA, colorA, boxSize / 2,
+							deleteA->GetAngle(), Vec2(deleteA->GetLinearVelocity()), deleteA->GetAngularVelocity(),
+							bounds, world, rng
+						)
+					);
+					it_map->second = ContactListener::Remove;
+				}
+
+				if (reinterpret_cast<Box*>(deleteB->GetUserData())->GetSize() > boxSize / 2)
+				{
+					Vec2 posB = Vec2(deleteB->GetPosition()) + tiles[i].second;
+
+					// Color colorB = reinterpret_cast<Box*>(deleteB->GetUserData())->GetColorTrait().GetColor();
+					Color colorB = Colors::Blue;
+					boxPtrs.emplace_back(
+						Box::Spawn(
+							posB, colorB, boxSize / 2,
+							deleteB->GetAngle(), Vec2(deleteB->GetLinearVelocity()), deleteB->GetAngularVelocity(),
+							bounds, world, rng
+						)
+					);
+					it_map->second = ContactListener::Remove;
+				}
+			}
+		}
+
+		if (it_map->second == ContactListener::Remove)
 		{
 			for (auto it_vec = boxPtrs.begin(); it_vec != boxPtrs.end();)
 			{

@@ -10,7 +10,8 @@ class ContactListener : public b2ContactListener
 public:
 	enum Pattern
 	{
-		SameColor,
+		Remove,
+		Split,
 		Count
 	};
 
