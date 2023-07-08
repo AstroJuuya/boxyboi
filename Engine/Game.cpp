@@ -41,30 +41,7 @@ Game::Game( MainWindow& wnd )
 		return Box::Spawn( boxSize,bounds,world,rng );
 	} );
 
-	class Listener : public b2ContactListener
-	{
-	public:
-		void BeginContact( b2Contact* contact ) override
-		{
-			const b2Body* bodyPtrs[] = { contact->GetFixtureA()->GetBody(),contact->GetFixtureB()->GetBody() };
-			if( bodyPtrs[0]->GetType() == b2BodyType::b2_dynamicBody &&
-				bodyPtrs[1]->GetType() == b2BodyType::b2_dynamicBody )
-			{
-				Box* boxPtrs[] = { 
-					reinterpret_cast<Box*>(bodyPtrs[0]->GetUserData()),
-					reinterpret_cast<Box*>(bodyPtrs[1]->GetUserData())
-				};
-				auto& tid0 = typeid(boxPtrs[0]->GetColorTrait());
-				auto& tid1 = typeid(boxPtrs[1]->GetColorTrait());
-
-				std::stringstream msg;
-				msg << "Collision between " << tid0.name() << " and " << tid1.name() << std::endl;
-				OutputDebugStringA( msg.str().c_str() );
-			}
-		}
-	};
-	static Listener mrLister;
-	world.SetContactListener( &mrLister );
+	world.SetContactListener( &listener );
 }
 
 void Game::Go()

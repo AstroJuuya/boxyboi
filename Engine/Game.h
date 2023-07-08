@@ -30,6 +30,7 @@
 #include "Pipeline.h"
 #include "SolidEffect.h"
 #include <random>
+#include "ContactListener.h"
 
 class Game
 {
@@ -58,5 +59,6 @@ private:
 	b2World world;
 	Boundaries bounds = Boundaries( world,boundarySize );
 	std::vector<std::unique_ptr<Box>> boxPtrs;
+	ContactListener listener;
 	/********************************/
 };
