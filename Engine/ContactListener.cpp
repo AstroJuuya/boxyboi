@@ -13,17 +13,23 @@ void ContactListener::BeginContact(b2Contact* contact)
 		auto& tid0 = typeid(boxPtrs[0]->GetColorTrait());
 		auto& tid1 = typeid(boxPtrs[1]->GetColorTrait());
 
-		if (boxPtrs[0]->GetColorTrait().GetColor() == Colors::White && tid0 == tid1)
-		{
-			contactPatternMap.emplace(contact, Pattern::Split);
-		}
-		else if (boxPtrs[0]->GetColorTrait().GetColor() == Colors::Red && tid0 == tid1)
-		{
-			contactPatternMap.emplace(contact, Pattern::Remove);
-		}
+		Color col0 = boxPtrs[0]->GetColorTrait().GetColor();
+		Color col1 = boxPtrs[1]->GetColorTrait().GetColor();
+
+		if (col0 == Colors::Red || col1 == Colors::Red)
+			contactPatternMap.insert_or_assign(contact, Pattern::Remove);
+		else if (col0 == Colors::Blue || col1 == Colors::Blue)
+			contactPatternMap.insert_or_assign(contact, Pattern::Wololo);
+		else if (col0 == Colors::White || col1 == Colors::White)
+			contactPatternMap.insert_or_assign(contact, Pattern::Split);
 
 		std::stringstream msg;
 		msg << "Collision between " << tid0.name() << " and " << tid1.name() << std::endl;
 		OutputDebugStringA(msg.str().c_str());
 	}
+}
+
+void ContactListener::EndContact(b2Contact* contact)
+{
+
 }

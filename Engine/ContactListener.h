@@ -12,11 +12,13 @@ public:
 	{
 		Remove,
 		Split,
+		Wololo,
 		Count
 	};
 
 public:
 	void BeginContact(b2Contact* contact) override;
+	void EndContact(b2Contact* contact) override;
 
 public:
 	std::unordered_map<b2Contact*, Pattern> contactPatternMap;

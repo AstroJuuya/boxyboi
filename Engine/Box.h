@@ -95,6 +95,7 @@ public:
 	{
 		return *pColorTrait;
 	}
+	void SetColor(Color color);
 private:
 	static void Init()
 	{

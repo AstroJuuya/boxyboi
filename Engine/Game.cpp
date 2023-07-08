@@ -58,9 +58,16 @@ void Game::UpdateModel()
 	world.Step( dt,8,3 );
 	for (auto it_map = listener.contactPatternMap.begin(); it_map != listener.contactPatternMap.end();)
 	{
-		auto contact = it_map->first;
-		auto deleteA = contact->GetFixtureA()->GetBody();
-		auto deleteB = contact->GetFixtureB()->GetBody();
+		b2Contact* contact = it_map->first;
+		b2Body* contactBodies[2] = {
+			contact->GetFixtureA()->GetBody(),
+			contact->GetFixtureB()->GetBody() };
+
+		Color contactBodyColors[2] = { 
+			reinterpret_cast<Box*>(contactBodies[0]->GetUserData())->GetColorTrait().GetColor(),
+			reinterpret_cast<Box*>(contactBodies[1]->GetUserData())->GetColorTrait().GetColor() };
+
+		b2Body* muteBody = nullptr;
 
 		if (it_map->second == ContactListener::Split)
 		{
@@ -81,60 +88,52 @@ void Game::UpdateModel()
 
 			for (int i = 0; i < 4; ++i)
 			{
-				if (reinterpret_cast<Box*>(deleteA->GetUserData())->GetSize() > boxSize / 2)
+				muteBody = contactBodyColors[0] == Colors::White ? contactBodies[1] : contactBodies[0];
+				if (reinterpret_cast<Box*>(muteBody->GetUserData())->GetSize() > boxSize / 2)
 				{
-					Vec2 posA = Vec2(deleteA->GetPosition()) + tiles[i].second;
+					Vec2 pos = Vec2(muteBody->GetPosition()) + tiles[i].second;
 
-					// Color colorA = reinterpret_cast<Box*>(deleteA->GetUserData())->GetColorTrait().GetColor();
-					Color colorA = Colors::Blue;
+					Color color = reinterpret_cast<Box*>(muteBody->GetUserData())->GetColorTrait().GetColor();
 					boxPtrs.emplace_back(
 						Box::Spawn(
-							posA, colorA, boxSize / 2,
-							deleteA->GetAngle(), Vec2(deleteA->GetLinearVelocity()), deleteA->GetAngularVelocity(),
-							bounds, world, rng
-						)
-					);
-					it_map->second = ContactListener::Remove;
-				}
-
-				if (reinterpret_cast<Box*>(deleteB->GetUserData())->GetSize() > boxSize / 2)
-				{
-					Vec2 posB = Vec2(deleteB->GetPosition()) + tiles[i].second;
-
-					// Color colorB = reinterpret_cast<Box*>(deleteB->GetUserData())->GetColorTrait().GetColor();
-					Color colorB = Colors::Blue;
-					boxPtrs.emplace_back(
-						Box::Spawn(
-							posB, colorB, boxSize / 2,
-							deleteB->GetAngle(), Vec2(deleteB->GetLinearVelocity()), deleteB->GetAngularVelocity(),
+							pos, color, boxSize / 2,
+							muteBody->GetAngle(), Vec2(muteBody->GetLinearVelocity()), muteBody->GetAngularVelocity(),
 							bounds, world, rng
 						)
 					);
 					it_map->second = ContactListener::Remove;
 				}
 			}
+			if (it_map->second == ContactListener::Split)
+				it_map = listener.contactPatternMap.erase(it_map);
+			continue;
+		}
+
+		if (it_map->second == ContactListener::Wololo)
+		{
+			muteBody = contactBodyColors[0] == Colors::Blue ? contactBodies[1] : contactBodies[0];
+			reinterpret_cast<Box*>(muteBody->GetUserData())->SetColor(Colors::Blue);
+			it_map = listener.contactPatternMap.erase(it_map);
+			continue;
 		}
 
 		if (it_map->second == ContactListener::Remove)
 		{
+			if (muteBody == nullptr)
+				muteBody = contactBodyColors[0] == Colors::Red ? contactBodies[1] : contactBodies[0];
 			for (auto it_vec = boxPtrs.begin(); it_vec != boxPtrs.end();)
 			{
-				if (it_vec->get() == deleteA->GetUserData() ||
-					it_vec->get() == deleteB->GetUserData())
+				if (it_vec->get() == muteBody->GetUserData())
 				{
 					it_vec = boxPtrs.erase(it_vec);
 				}
 				else
-				{
 					++it_vec;
-				}
 			}
 			it_map = listener.contactPatternMap.erase(it_map);
 		}
 		else
-		{
 			++it_map;
-		}
 	}
 }
 

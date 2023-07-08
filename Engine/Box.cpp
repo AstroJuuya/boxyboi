@@ -155,3 +155,25 @@ std::unique_ptr<Box> Box::Spawn(
 
 	return std::make_unique<Box>(std::move(pColorTrait), world, pos, size, angle, linVel, angVel);
 }
+
+void Box::SetColor(Color color)
+{
+	switch (color.dword)
+	{
+	case 0xFF0000:
+		pColorTrait = std::make_unique<RedTrait>();
+		break;
+	case 0x00FF00:
+		pColorTrait = std::make_unique<GreenTrait>();
+		break;
+	case 0x0000FF:
+		pColorTrait = std::make_unique<BlueTrait>();
+		break;
+	case 0xFFFFFF:
+		pColorTrait = std::make_unique<WhiteTrait>();
+		break;
+	case 0xFFFF00:
+		pColorTrait = std::make_unique<YellowTrait>();
+		break;
+	}
+}
