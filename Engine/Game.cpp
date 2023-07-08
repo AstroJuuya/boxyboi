@@ -56,6 +56,33 @@ void Game::UpdateModel()
 {
 	const float dt = ft.Mark();
 	world.Step( dt,8,3 );
+	for (auto it_map = listener.contactPatternMap.begin(); it_map != listener.contactPatternMap.end();)
+	{
+		auto contact = it_map->first;
+		auto deleteA = contact->GetFixtureA()->GetBody();
+		auto deleteB = contact->GetFixtureB()->GetBody();
+
+		if (it_map->second == ContactListener::SameColor)
+		{
+			for (auto it_vec = boxPtrs.begin(); it_vec != boxPtrs.end();)
+			{
+				if (it_vec->get() == deleteA->GetUserData() ||
+					it_vec->get() == deleteB->GetUserData())
+				{
+					it_vec = boxPtrs.erase(it_vec);
+				}
+				else
+				{
+					++it_vec;
+				}
+			}
+			it_map = listener.contactPatternMap.erase(it_map);
+		}
+		else
+		{
+			++it_map;
+		}
+	}
 }
 
 void Game::ComposeFrame()
